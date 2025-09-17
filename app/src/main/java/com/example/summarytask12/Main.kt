@@ -13,7 +13,12 @@ fun main(){
     val customer: Customer? = HotelDB.getCustomer("C002")
     println(customer)
 
+    println("-----------------------------------------------------------------------------------------")
     println(HotelDB.getCustomerList())
+
+    println("-----------------------------------------------------------------------------------------")
     println(HotelDB.getRoomList())
+
+    println("-----------------------------------------------------------------------------------------")
     println(HotelDB.getBookingList())
 }
