@@ -101,3 +101,9 @@
   - `addRoom()`, `getRoom()`
   - `addBooking()`, `getBooking()`
   - `updateBooking()`, `deleteRoom()`
+
+### 7. Sơ đồ phân cấp hệ thống
+
+<p align="center">
+  <img src="summarytask12.png" alt="Cấu trúc dự án" width="500"/>
+</p>
