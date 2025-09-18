@@ -9,9 +9,9 @@ data class Booking(
     val roomId: String,
     val date: String,
     val nights: Int,
-    val status: BookingStatus = BookingStatus.PENDING,
-    val paymentMethod: String?,
-    val totalAmount: Double
+    var status: BookingStatus = BookingStatus.PENDING,
+    var paymentMethod: String?,
+    var totalAmount: Double
 ) {
     constructor(
         id: String,
@@ -37,6 +37,20 @@ data class Booking(
         calculateTotal(customerId, roomId, nights)
     )
 
+    override fun toString(): String {
+        return "Booking(" +
+                "id='$id', " +
+                "customerId='$customerId', " +
+                "roomId='$roomId', " +
+                "date='$date', " +
+                "nights=$nights, " +
+                "status=$status, " +
+                "paymentMethod=$paymentMethod, " +
+                "totalAmount=$totalAmount" +
+                ")\n"
+    }
+
+
     companion object {
         fun calculateTotal(customerId: String, roomId: String, nights: Int): Double {
             val room = HotelDB.getRoom(roomId)
@@ -44,6 +58,7 @@ data class Booking(
 
             val baseAmount = room?.calculatePrice(nights) ?: 0.0
             return customer?.applyDiscount(baseAmount) ?: baseAmount
+
         }
     }
 

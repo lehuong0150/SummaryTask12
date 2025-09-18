@@ -7,24 +7,25 @@ class VIPCustomer(
     name: String,
     email: String,
     phone: String? = null,
-    private var loyaltyPoints: Int = 0,
+    private var specialRequests: MutableList<String>? = null,
 ) : Customer(id, name, email, phone) {
 
 
     override fun getDisplayInfo() {
         Log.d(
             "InfoCustomer",
-            "getDisplayInfo: ID: $id, Name: $name, Email: $email, Phone: $phone, Membership Level: VIP, Loyalty Points: $loyaltyPoints"
+            "getDisplayInfo: ID: $id, Name: $name, Email: $email, Phone: $phone, Membership Level: VIP, SpecialRequests: $getSpecialRequests"
         )
     }
 
     override fun toString(): String {
-        return "VIPCustomer(id=$id, name=$name, email=$email, phone=$phone, membershipLevel=VIP,Loyalty Points =$loyaltyPoints)"
+        return "VIPCustomer(id=$id, name=$name, email=$email, phone=$phone, membershipLevel=VIP, SpecialRequests =$getSpecialRequests)"
     }
 
-    val getLoyaltyPoints = loyaltyPoints
-    fun setLoyaltyPoints(loyaltyPoints: Int){
-         this.loyaltyPoints = loyaltyPoints
+    private val getSpecialRequests = specialRequests
+
+    fun addSpecialRequest(request: String) {
+        specialRequests?.add(request)
     }
 
 }
