@@ -8,6 +8,8 @@ import com.example.summarytask12.model.accommodation.StandardRoom
 import com.example.summarytask12.model.accommodation.SuiteRoom
 import com.example.summarytask12.model.users.Customer
 import com.example.summarytask12.model.users.VIPCustomer
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 
 
 object HotelDB {
@@ -19,7 +21,7 @@ object HotelDB {
         initializeSampleData()
     }
 
-    private fun initializeSampleData() {
+    private fun initializeSampleData() = runBlocking() {
         //list room
         initInfoRoom()
 
@@ -29,9 +31,10 @@ object HotelDB {
         //list Booking
         initInfoBooking()
 
+
     }
 
-    private fun initInfoCustomer() {
+    private suspend fun initInfoCustomer() {
         addCustomer(Customer("C001", "Nguyễn Văn Hải", "vana@email.com", "0901234567", "BASIC"))
         addCustomer(
             VIPCustomer(
@@ -59,7 +62,8 @@ object HotelDB {
         addCustomer(Customer("C006", "Võ Tiến Khoa", "khoa@email.com", "0925634169", "PREMIUM"))
     }
 
-    private fun initInfoRoom() {
+    private suspend fun initInfoRoom() {
+        delay(500L)
         addRoom(StandardRoom("R001", 800000.0, true))
         addRoom(StandardRoom("R002", 850000.0, true))
         addRoom(
@@ -75,8 +79,9 @@ object HotelDB {
         addRoom(StandardRoom("R006", 850000.0, false))
     }
 
-    private fun initInfoBooking() {
-        addBooking(Booking("B001", "COO1", "R004", "2025-09-17", 2, "CONFIRMED", "CASH"))
+    private suspend fun initInfoBooking() {
+        delay(500L)
+        addBooking(Booking("B001", "C001", "R004", "2025-09-17", 2, "CONFIRMED", "CASH"))
         addBooking(Booking("B002", "C006", "R005", "2025-09-16", 3, "CONFIRMED", "CASH"))
         addBooking(Booking("B003", "COO2", "R006", "2025-09-16", 4, "CONFIRMED", "CASH"))
     }
