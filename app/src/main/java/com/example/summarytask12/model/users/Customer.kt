@@ -1,6 +1,6 @@
 package com.example.summarytask12.model.users
 
-import android.util.Log
+
 import com.example.summarytask12.model.Discountable
 import com.example.summarytask12.utils.MemberShipLevels
 
@@ -36,38 +36,47 @@ open class Customer(
         println("Information Customer: ID: $id, Name: $name, Email: $email, Phone: $phone, Membership Level: $membershipLevel")
     }
 
-    override fun validateInfo() {
+    public override fun validateInfo(): Boolean {
         if (name.isBlank()) {
-            throw IllegalArgumentException("Name cannot be empty!!!")
-            println("Name cannot be empty!!!")
+            println("Name customer cannot be empty!!!")
+            return false
         } else {
-            println("Input name success!!!")
+            return true
         }
+
         when (email) {
             "" -> {
-                throw IllegalArgumentException("Email cannot be empty")
-               println("Email cannot be empty!!!!")
+                println("Email customer cannot be empty!!!!")
+                return false
             }
 
             else -> {
                 val emailRegex = "^[A-Za-z](.*)(@)(.+)(\\.)(.+)"
                 if (!email.matches(emailRegex.toRegex())) {
-                    throw IllegalArgumentException("Invalid email format")
-                    println("Invalid email format!!!")
+                    println("Invalid email customer format!!!")
+                    return false
                 } else {
-                    println("Input email success!!!!")
+                    return true
                 }
             }
         }
 
         phone?.let {
             if (it.length < 10) {
-                throw IllegalArgumentException("Phone number must be at least 10 digits")
-               println("Phone number must be at least 10 digits!!!")
+                println("Phone number customer must be at least 10 digits!!!")
+                return false
             } else {
-               println("Input phone success!!!!")
+                return true
             }
-        } ?: println("Phone number cannot be empty!!!!")
+        } ?: run {
+            println("Phone number customer cannot be empty!!!!")
+            return false
+        }
+
+    }
+
+    override fun toString(): String {
+        return "Customer: ID: $id, Name: $name, Email: $email, Phone: $phone, Membership Level: $membershipLevel\n"
     }
 
     override fun discountRate(): Double = when (membershipLevel) {

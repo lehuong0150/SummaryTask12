@@ -9,5 +9,5 @@ abstract class Person(
     abstract fun getRole(): String
     abstract fun getDisplayInfo()
 
-    protected abstract fun validateInfo()
+    protected abstract fun validateInfo():Boolean
 }

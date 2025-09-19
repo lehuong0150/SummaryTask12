@@ -21,21 +21,17 @@ object HotelDB {
 
     private fun initializeSampleData() {
         //list room
-        addRoom(StandardRoom("R001", 800000.0, true))
-        addRoom(StandardRoom("R002", 850000.0, true))
-        addRoom(
-            DeluxeRoom(
-                "R003",
-                1200000.0,
-                isAvailable = true,
-                hasOceanView = true
-            )
-        ) // with ocean view
-        addRoom(DeluxeRoom("R004", 1100000.0, isAvailable = false, hasOceanView = false))
-        addRoom(SuiteRoom("R005", 2000000.0, false))
-        addRoom(StandardRoom("R006", 850000.0, false))
+        initInfoRoom()
 
         //list customer
+        initInfoCustomer()
+
+        //list Booking
+        initInfoBooking()
+
+    }
+
+    private fun initInfoCustomer() {
         addCustomer(Customer("C001", "Nguyễn Văn Hải", "vana@email.com", "0901234567", "BASIC"))
         addCustomer(
             VIPCustomer(
@@ -61,18 +57,33 @@ object HotelDB {
 
         addCustomer(Customer("C005", "Trần Đình Hưng", "hung@email.com", "0945632507", "PREMIUM"))
         addCustomer(Customer("C006", "Võ Tiến Khoa", "khoa@email.com", "0925634169", "PREMIUM"))
+    }
 
-        //list Booking
+    private fun initInfoRoom() {
+        addRoom(StandardRoom("R001", 800000.0, true))
+        addRoom(StandardRoom("R002", 850000.0, true))
+        addRoom(
+            DeluxeRoom(
+                "R003",
+                1200000.0,
+                isAvailable = true,
+                hasOceanView = true
+            )
+        ) // with ocean view
+        addRoom(DeluxeRoom("R004", 1100000.0, isAvailable = false, hasOceanView = false))
+        addRoom(SuiteRoom("R005", 2000000.0, false))
+        addRoom(StandardRoom("R006", 850000.0, false))
+    }
+
+    private fun initInfoBooking() {
         addBooking(Booking("B001", "COO1", "R004", "2025-09-17", 2, "CONFIRMED", "CASH"))
         addBooking(Booking("B002", "C006", "R005", "2025-09-16", 3, "CONFIRMED", "CASH"))
         addBooking(Booking("B003", "COO2", "R006", "2025-09-16", 4, "CONFIRMED", "CASH"))
-
-
     }
 
     //CRUD
     private fun addCustomer(customer: Customer?): Boolean {
-        return if (customer != null) {
+        return if (customer != null && customer.validateInfo()) {
             if (!customerList.any { it.id == customer.id }) {
                 customerList.add(customer) // add() trả về Boolean luôn
             } else {
@@ -140,7 +151,7 @@ object HotelDB {
             } ?: false
     }
 
-    fun deleteRoom(idRoom: String):Boolean{
+    fun deleteRoom(idRoom: String): Boolean {
         bookingList.indexOfFirst { it.id == idRoom }
             .takeIf { it != -1 }
             ?.let { index ->
