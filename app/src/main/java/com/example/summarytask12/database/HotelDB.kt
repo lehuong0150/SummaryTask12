@@ -9,6 +9,7 @@ import com.example.summarytask12.model.accommodation.SuiteRoom
 import com.example.summarytask12.model.users.Customer
 import com.example.summarytask12.model.users.VIPCustomer
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -37,7 +38,6 @@ object HotelDB {
         launch {
             initInfoBooking()
         }
-
 
     }
 
