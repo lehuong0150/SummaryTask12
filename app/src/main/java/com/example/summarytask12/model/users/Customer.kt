@@ -33,10 +33,10 @@ open class Customer(
     override fun getRole(): String = "Customer"
 
     override fun getDisplayInfo() {
-        println("Information Customer: ID: $id, Name: $name, Email: $email, Phone: $phone, Membership Level: $membershipLevel")
+        println("Information Customer: ID: $id, Name: $name, Email: $email, Phone: $phone, Membership Level: $membershipLevel \n")
     }
 
-    public override fun validateInfo(): Boolean {
+    override fun validateInfo(): Boolean {
         if (name.isBlank()) {
             println("Name customer cannot be empty!!!")
             return false
@@ -49,7 +49,6 @@ open class Customer(
                 println("Email customer cannot be empty!!!!")
                 return false
             }
-
             else -> {
                 val emailRegex = "^[A-Za-z](.*)(@)(.+)(\\.)(.+)"
                 if (!email.matches(emailRegex.toRegex())) {
@@ -72,7 +71,6 @@ open class Customer(
             println("Phone number customer cannot be empty!!!!")
             return false
         }
-
     }
 
     override fun toString(): String {
@@ -85,5 +83,4 @@ open class Customer(
         MemberShipLevels.BASIC -> 0.05
         else -> 0.0
     }
-
 }

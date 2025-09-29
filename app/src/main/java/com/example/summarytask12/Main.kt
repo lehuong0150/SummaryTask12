@@ -1,10 +1,12 @@
 package com.example.summarytask12
 
-import com.example.summarytask12.database.HotelDB
+import android.os.Build
+import androidx.annotation.RequiresApi
+import com.example.summarytask12.utils.DataInitializer
 
+@RequiresApi(Build.VERSION_CODES.O)
 fun main() {
-
-    println("-----------------------------------------------------------------------------------------")
-    val app = HotelBookingApp()
-    app.showMenu()
+    DataInitializer.initialize()
+    val app = HotelBookingConsole()
+    app.showMainMenu()
 }

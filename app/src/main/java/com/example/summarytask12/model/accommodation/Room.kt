@@ -2,6 +2,7 @@ package com.example.summarytask12.model.accommodation
 
 abstract class Room(
     val id: String,
+    val numberRoom: String,
     val type: String? = null,
     var price: Double,
     val maxGuests: Int = 2,

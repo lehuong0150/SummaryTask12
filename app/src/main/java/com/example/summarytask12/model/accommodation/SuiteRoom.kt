@@ -2,9 +2,10 @@ package com.example.summarytask12.model.accommodation
 
 class SuiteRoom(
     id: String,
+    numberRoom: String,
     price: Double,
     isAvailable: Boolean = true
-) : Room(id, "SUITE", price, maxGuests = 6, isAvailable) {
+) : Room(id, "115", "SUITE", price, maxGuests = 6, isAvailable) {
 
     override fun getDescribeRoom(): MutableList<String> {
         return mutableListOf(
@@ -23,8 +24,8 @@ class SuiteRoom(
     }
 
     override fun toString(): String {
-        return "SuiteRoom(id=$id, type=$type, price=$price, isAvailable=$isAvailable, " +
-                "maxGuests=$maxGuests, describeRoom = ${getDescribeRoom()})"
+        return "SuiteRoom(id= $id,numberRoom= $numberRoom, type= $type, price= $price, isAvailable= $isAvailable, " +
+                "maxGuests= $maxGuests, describeRoom = ${getDescribeRoom()})\n"
     }
 
 }
