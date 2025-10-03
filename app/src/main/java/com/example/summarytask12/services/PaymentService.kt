@@ -9,13 +9,10 @@ class PaymentService(
 ) {
 
     fun processPayment(payment: Payment): Boolean {
-        return if (paymentRepo.addPayment(payment)) {
-            println("Payment processed: ${payment.paymentId}")
-            true
-        } else {
-            println("Failed to process payment: ${payment.paymentId}")
-            false
-        }
+        return if (paymentRepo.addPayment(payment) {
+                println("Payment processed: ${payment.paymentId}")
+                true
+            } false
     }
 
     fun issueInvoice(invoice: Invoice) {
@@ -26,6 +23,8 @@ class PaymentService(
     fun getPayment(id: String): Payment? =
         paymentRepo.getPaymentById(id)
 
+    fun getPaymentsByBooking(bookingId: String): List<Payment> =
+        paymentRepo.getPaymentsByBookingId(bookingId)
 
     fun getInvoice(id: String): Invoice? =
         paymentRepo.getInvoiceById(id)

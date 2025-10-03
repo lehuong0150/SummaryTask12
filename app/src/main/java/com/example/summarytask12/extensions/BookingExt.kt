@@ -10,7 +10,6 @@ import java.time.format.DateTimeFormatter
 fun Booking.canCancel(): Boolean {
     return ((status in listOf(BookingStatus.PENDING, BookingStatus.CONFIRMED))
             && (paymentMethod == PaymentMethod.CASH))
-
 }
 
 fun Booking.checkInDate(): LocalDateTime =

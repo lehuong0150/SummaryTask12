@@ -6,7 +6,6 @@ import com.example.summarytask12.model.users.VIPCustomer
 class CustomerRepository {
     private val customers = mutableListOf<Customer>()
 
-
     fun addCustomer(customer: Customer): Boolean =
         customers.none { it.id == customer.id }
             .also { canAdd -> if (canAdd) customers.add(customer) }
@@ -22,5 +21,4 @@ class CustomerRepository {
 
     fun deleteCustomer(customerId: String): Boolean =
         customers.removeIf { it.id == customerId }
-
 }
