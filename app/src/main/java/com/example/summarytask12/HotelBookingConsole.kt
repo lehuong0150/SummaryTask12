@@ -3,7 +3,6 @@ package com.example.summarytask12
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.summarytask12.controller.*
-import com.example.summarytask12.controllers.CustomerController
 import com.example.summarytask12.repository.*
 import com.example.summarytask12.services.*
 import java.util.*
