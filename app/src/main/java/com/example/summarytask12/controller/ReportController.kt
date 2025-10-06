@@ -6,62 +6,80 @@ import com.example.summarytask12.extensions.summary
 import com.example.summarytask12.services.CustomerService
 import com.example.summarytask12.services.PaymentService
 import com.example.summarytask12.services.RoomService
+import com.example.summarytask12.utils.InputHandler
+import com.example.summarytask12.utils.OutputHandler
 
 @RequiresApi(Build.VERSION_CODES.O)
 class ReportController(
     private val roomService: RoomService,
     private val customerService: CustomerService,
-    private val paymentService: PaymentService
+    private val paymentService: PaymentService,
+    private val input: InputHandler = InputHandler(),
+    private val output: OutputHandler = OutputHandler()
 ) {
 
     fun showMenu() {
         while (true) {
-            println("\n" + "=".repeat(50))
-            println("REPORT MENU")
-            println("1. Revenue Report")
-            println("2. Room Status Report")
-            println("3. Customer Report")
-            println("0. Back to Main Menu")
-            println("=".repeat(50))
-            print("Choose: ")
+            output.printHeader("REPORT MANAGEMENT")
+            output.printMessage("1. Revenue Report")
+            output.printMessage("2. Room Status Report")
+            output.printMessage("3. Customer Report")
+            output.printMessage("0. Back")
 
-            when (readLine()) {
+            when (input.prompt("Choose")) {
                 "1" -> showRevenueReport()
                 "2" -> showRoomStatusReport()
                 "3" -> showCustomerReport()
                 "0" -> return
-                else -> println("Invalid choice!")
+                else -> output.printError("Invalid choice!")
             }
         }
     }
 
     private fun <T> printReport(title: String, items: List<T>, mapper: (T) -> String) {
-        println("\n$title")
-        println("-".repeat(50))
-        items.map(mapper).forEach(::println)
-        println("-".repeat(50))
+        output.printList(title, items, mapper)
     }
 
     private fun showRevenueReport() {
-        val payments = paymentService.getAllPayments()
-        val totalRevenue = payments.sumOf { it.amount }
+        output.printSubHeader("Revenue Report")
 
-        println("\nTOTAL REVENUE: $totalRevenue")
-        printReport("REVENUE REPORT", payments) { it.summary() }
+        val payments = paymentService.getAllPayments()
+        val totalRevenue = payments.sumOf { it.totalAmount }
+
+        output.printMessage("Total Revenue: $totalRevenue")
+        if (payments.isEmpty()) {
+            output.printMessage("No payments found.")
+        } else {
+            printReport("REVENUE REPORT", payments) { it.summary() }
+        }
     }
 
     private fun showRoomStatusReport() {
+        output.printSubHeader("Room Status Report")
+
         val rooms = roomService.getAllRooms()
-        printReport("ROOM STATUS REPORT", rooms) { room ->
-            room.let {
-                "Room ${it.numberRoom} | Type: ${it.type} " +
-                        "| Status: ${if (it.isAvailable) "Available" else "Occupied"}"
+        if (rooms.isEmpty()) {
+            output.printMessage("No rooms found.")
+        } else {
+            printReport("ROOM STATUS REPORT", rooms) { room ->
+                "Room ${room.numberRoom} | Type: ${room.type} | Status: ${
+                    if (room.isAvailable)
+                        "Available" else "Occupied"
+                }"
             }
         }
     }
 
     private fun showCustomerReport() {
+        output.printSubHeader("Customer Report")
+
         val customers = customerService.getAllCustomers()
-        printReport("CUSTOMER REPORT", customers) { c -> "${c.name} | ${c.email} | ${c.phone}" }
+        if (customers.isEmpty()) {
+            output.printMessage("No customers found.")
+        } else {
+            printReport("CUSTOMER REPORT", customers) {
+                "${it.name} | ${it.email} | ${it.phone}"
+            }
+        }
     }
 }

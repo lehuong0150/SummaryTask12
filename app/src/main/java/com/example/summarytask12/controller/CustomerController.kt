@@ -1,148 +1,122 @@
-package com.example.summarytask12.controllers
+package com.example.summarytask12.controller
 
 import com.example.summarytask12.model.users.Customer
 import com.example.summarytask12.model.users.VIPCustomer
 import com.example.summarytask12.services.CustomerService
-import java.util.*
+import com.example.summarytask12.utils.InputHandler
+import com.example.summarytask12.utils.OutputHandler
 
 class CustomerController(
-    private val customerService: CustomerService
+    private val customerService: CustomerService,
+    private val input: InputHandler = InputHandler(),
+    private val output: OutputHandler = OutputHandler()
 ) {
-    private val scanner = Scanner(System.`in`)
 
-    // Show Menu
     fun showMenu() {
         while (true) {
-            println("\n=== CUSTOMER MENU ===")
-            println("1. Register Normal Customer")
-            println("2. Register VIP Customer")
-            println("3. View All Customers")
-            println("4. Update Customer")
-            println("5. Delete Customer")
-            println("0. Exit")
-            print("Choose option: ")
+            output.printHeader("CUSTOMER MANAGEMENT")
+            output.printMessage("1. Register Normal Customer")
+            output.printMessage("2. Register VIP Customer")
+            output.printMessage("3. View All Customers")
+            output.printMessage("4. Update Customer")
+            output.printMessage("5. Delete Customer")
+            output.printMessage("0. Back")
 
-            when (scanner.nextLine()) {
+            when (input.prompt("Choose")) {
                 "1" -> handleRegisterCustomer()
                 "2" -> handleRegisterVIPCustomer()
                 "3" -> handleViewAllCustomers()
                 "4" -> handleUpdateCustomer()
                 "5" -> handleDeleteCustomer()
-                "0" -> {
-                    println("Exit Customer Menu...")
-                    return
-                }
-
-                else -> println("Invalid choice!")
+                "0" -> return
+                else -> output.printError("Invalid choice!")
             }
         }
     }
 
-    // 1. Đăng ký khách hàng thường
     private fun handleRegisterCustomer() {
-        println("---- Register Normal Customer ----")
-        print("Enter ID: ")
-        val id = scanner.nextLine().trim()
-        print("Enter Name: ")
-        val name = scanner.nextLine().trim()
-        print("Enter Email: ")
-        val email = scanner.nextLine().trim()
-        print("Enter Phone: ")
-        val phone = scanner.nextLine().trim()
+        output.printSubHeader("Register Normal Customer")
+        val id = input.prompt("Enter ID")
+        val name = input.prompt("Enter Name")
+        val email = input.prompt("Enter Email")
+        val phone = input.prompt("Enter Phone")
 
         val customer = Customer(id, name, email, phone)
         if (customer.validateInfo()) {
             customerService.registerCustomer(customer)
+            output.printSuccess("Customer registered successfully!")
         } else {
-            println("Customer info invalid!")
+            output.printError("Customer info invalid!")
         }
     }
 
-    // 2. Đăng ký VIP Customer
     private fun handleRegisterVIPCustomer() {
-        println("---- Register VIP Customer ----")
-        print("Enter ID: ")
-        val id = scanner.nextLine().trim()
-        print("Enter Name: ")
-        val name = scanner.nextLine().trim()
-        print("Enter Email: ")
-        val email = scanner.nextLine().trim()
-        print("Enter Phone: ")
-        val phone = scanner.nextLine().trim()
+        output.printSubHeader("Register VIP Customer")
+        val id = input.prompt("Enter ID")
+        val name = input.prompt("Enter Name")
+        val email = input.prompt("Enter Email")
+        val phone = input.prompt("Enter Phone")
 
         val vipCustomer = VIPCustomer(id, name, email, phone, mutableListOf())
-        println("Add special request (Enter để bỏ qua): ")
-        val request = scanner.nextLine()
-        if (request.isNotBlank()) {
-            vipCustomer.addSpecialRequest(request)
-        }
+        val request = input.prompt("Add special request (Enter to skip)")
+        if (request.isNotBlank()) vipCustomer.addSpecialRequest(request)
 
         if (vipCustomer.validateInfo()) {
-            customerService.registerCustomer(vipCustomer) // lưu chung
+            customerService.registerCustomer(vipCustomer)
+            output.printSuccess("VIP Customer registered successfully!")
         } else {
-            println("VIP Customer info invalid!")
+            output.printError("VIP Customer info invalid!")
         }
     }
 
-    // 3. Xem tất cả customer
     private fun handleViewAllCustomers() {
-        println("---- All Customers ----")
         val customers = customerService.getAllCustomers()
         if (customers.isEmpty()) {
-            println("No customers found.")
+            output.printMessage("No customers found.")
         } else {
-            customers.forEach { customer ->
-                if (customer is VIPCustomer) {
-                    println("VIP -> $customer")
-                } else {
-                    println("Normal -> $customer")
-                }
+            output.printList("ALL CUSTOMERS", customers) { c ->
+                if (c is VIPCustomer) "VIP -> $c" else "Normal -> $c"
             }
         }
     }
 
-    // 4. Cập nhật Customer
     private fun handleUpdateCustomer() {
-        println("---- Update Customer ----")
-        print("Enter Customer ID: ")
-        val id = scanner.nextLine().trim()
-
+        output.printSubHeader("Update Customer")
+        val id = input.prompt("Enter Customer ID")
         val customer = customerService.getCustomer(id)
+
         if (customer == null) {
-            println("Customer not found!")
+            output.printError("Customer not found!")
             return
         }
-        println("Before update: $customer")
 
-        print("Enter new Name (Enter để bỏ qua): ")
-        val name = scanner.nextLine()
+        output.printMessage("Before update: $customer")
+
+        val name = input.prompt("Enter new Name (Enter to skip)")
         if (name.isNotBlank()) customer.name = name
 
-        print("Enter new Email (Enter để bỏ qua): ")
-        val email = scanner.nextLine()
+        val email = input.prompt("Enter new Email (Enter to skip)")
         if (email.isNotBlank()) customer.email = email
 
-        print("Enter new Phone (Enter để bỏ qua): ")
-        val phone = scanner.nextLine()
+        val phone = input.prompt("Enter new Phone (Enter to skip)")
         if (phone.isNotBlank()) customer.phone = phone
 
         if (customerService.updateCustomer(customer)) {
-            println("Customer updated: $customer")
+            output.printSuccess("Customer updated successfully!")
+            output.printMessage(customer.toString())
         } else {
-            println("Update failed!")
+            output.printError("Update failed!")
         }
     }
 
-    // 5. Xóa Customer
     private fun handleDeleteCustomer() {
-        println("---- Delete Customer ----")
-        print("Enter Customer ID: ")
-        val id = scanner.nextLine().trim()
+        output.printSubHeader("Delete Customer")
+        val id = input.prompt("Enter Customer ID")
 
         if (customerService.deleteCustomer(id)) {
-            println("Customer deleted successfully!")
+            output.printSuccess("Customer deleted successfully!")
         } else {
-            println("Delete failed!")
+            output.printError("Delete failed!")
         }
     }
 }

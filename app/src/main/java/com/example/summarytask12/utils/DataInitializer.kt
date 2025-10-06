@@ -7,10 +7,9 @@ import com.example.summarytask12.model.Booking
 import com.example.summarytask12.model.accommodation.DeluxeRoom
 import com.example.summarytask12.model.accommodation.StandardRoom
 import com.example.summarytask12.model.accommodation.SuiteRoom
-import com.example.summarytask12.model.payment.CashPayment
-import com.example.summarytask12.model.payment.CreditCardPayment
 import com.example.summarytask12.model.payment.Invoice
 import com.example.summarytask12.model.payment.InvoiceItem
+import com.example.summarytask12.model.payment.Payment
 import com.example.summarytask12.model.users.Customer
 import com.example.summarytask12.model.users.VIPCustomer
 import com.example.summarytask12.repository.HotelRepository
@@ -106,17 +105,17 @@ object DataInitializer {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun initPayments() {
         val payments = listOf(
-            CashPayment(
+            Payment(
                 "P001", 1600000.0, "2025-09-17T10:30:00".toLocalDateTime(),
-                "B001", "Nguyen Van A"
+                PaymentStyle.CreditCardPayment, "B001"
             ),
-            CreditCardPayment(
+            Payment(
                 "P002", 6000000.0, "2025-09-18T15:45:00".toLocalDateTime(),
-                "B002", "4111111111111111", "Tran Thi Nga",
+                PaymentStyle.CashPayment, "B002",
             ),
-            CashPayment(
+            Payment(
                 "P003", 3400000.0, "2025-09-19T09:00:00".toLocalDateTime(),
-                "B003", "Le Tuan"
+                PaymentStyle.CashPayment, "B003"
             )
         )
         payments.forEach { HotelRepository.paymentRepository.addPayment(it) }

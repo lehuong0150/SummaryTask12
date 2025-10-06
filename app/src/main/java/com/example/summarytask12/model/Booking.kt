@@ -13,42 +13,52 @@ data class Booking(
     val nights: Int,
     var status: BookingStatus = BookingStatus.PENDING,
     var paymentMethod: PaymentMethod,
-    var totalAmount: Double
+    var totalAmount: Double = 0.0
 ) {
-    constructor(
-        id: String,
-        customerId: String,
-        roomId: String,
-        date: LocalDateTime,
-        nights: Int,
-        status: String,
-        paymentMethod: String,
-    ) : this(
-        id,
-        customerId,
-        roomId,
-        date,
-        nights,
-        when (status.uppercase()) {
-            "PENDING" -> BookingStatus.PENDING
-            "CONFIRMED" -> BookingStatus.CONFIRMED
-            "CANCELLED" -> BookingStatus.CANCELLED
-            else -> BookingStatus.PENDING
-        },
-        when (paymentMethod.uppercase()) {
-            "CASH" -> PaymentMethod.CASH
-            "CARD" -> PaymentMethod.CREDIT_CARD
-            else -> PaymentMethod.CASH
-        },
-        calculateTotal(customerId, roomId, nights)
-    )
 
     companion object {
+        fun create(
+            id: String,
+            customerId: String,
+            roomId: String,
+            date: LocalDateTime,
+            nights: Int,
+            status: String,
+            paymentMethod: String
+        ): Booking {
+            val statusEnum = when (status.uppercase()) {
+                "PENDING" -> BookingStatus.PENDING
+                "CONFIRMED" -> BookingStatus.CONFIRMED
+                "CANCELLED" -> BookingStatus.CANCELLED
+                else -> BookingStatus.PENDING
+            }
+
+            val paymentEnum = when (paymentMethod.uppercase()) {
+                "CASH" -> PaymentMethod.CASH
+                "CARD", "CREDIT_CARD" -> PaymentMethod.CREDIT_CARD
+                else -> PaymentMethod.CASH
+            }
+
+            val total = calculateTotal(customerId, roomId, nights)
+
+            return Booking(
+                id = id,
+                customerId = customerId,
+                roomId = roomId,
+                date = date,
+                nights = nights,
+                status = statusEnum,
+                paymentMethod = paymentEnum,
+                totalAmount = total
+            )
+        }
+
         fun calculateTotal(customerId: String, roomId: String, nights: Int): Double {
             val room = HotelRepository.roomRepository.getRoomById(roomId)
             val customer = HotelRepository.customerRepository.getCustomerById(customerId)
-            val baseAmount = room?.calculatePrice(nights) ?: 0.0
-            return customer?.applyDiscount(baseAmount) ?: baseAmount
+            val roomPrice = (room as? Discountable)?.applyDiscount(room.price * nights)
+                ?: room?.price?.times(nights) ?: 0.0
+            return (customer as? Discountable)?.applyDiscount(roomPrice) ?: roomPrice
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.example.summarytask12.model.accommodation
 
+import com.example.summarytask12.model.Discountable
+
 
 class StandardRoom(
     id: String,
@@ -8,13 +10,18 @@ class StandardRoom(
     isAvailable: Boolean = true
 ) : Room(
     id, "112", "STANDARD", price, maxGuests = 2, isAvailable
-) {
+), Discountable {
     override fun getDescribeRoom(): MutableList<String> {
         return mutableListOf("WiFi", "TV", "Điều hòa")
     }
 
     override fun calculatePrice(nights: Int): Double {
-        return price * nights
+        val basePrice = price * nights
+        return applyDiscount(basePrice)
+    }
+
+    override fun discountRate(): Double {
+        return 0.05
     }
 
     override fun toString(): String {

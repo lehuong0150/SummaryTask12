@@ -2,37 +2,33 @@ package com.example.summarytask12.controller
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.example.summarytask12.model.payment.CashPayment
-import com.example.summarytask12.model.payment.CreditCardPayment
 import com.example.summarytask12.model.payment.Invoice
 import com.example.summarytask12.model.payment.InvoiceItem
 import com.example.summarytask12.model.payment.Payment
 import com.example.summarytask12.repository.HotelRepository
 import com.example.summarytask12.services.PaymentService
-import com.example.summarytask12.utils.InvoiceStatus
-import com.example.summarytask12.utils.PaymentMethod
+import com.example.summarytask12.utils.*
 import java.time.LocalDateTime.now
-import java.util.*
 
 class PaymentController(
     private val paymentService: PaymentService,
+    private val input: InputHandler = InputHandler(),
+    private val output: OutputHandler = OutputHandler()
 ) {
-    private val scanner: Scanner = Scanner(System.`in`)
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun showMenu() {
         while (true) {
-            println("\n--- PAYMENT MANAGEMENT ---")
-            println("1. Process Payment")
-            println("2. Issue Invoice")
-            println("3. View All Payments")
-            println("4. View All Invoices")
-            println("5. Find Payment by ID")
-            println("6. Find Invoice by ID")
-            println("0. Back")
-            print("Choose: ")
+            output.printHeader("PAYMENT MANAGEMENT")
+            output.printMessage("1. Process Payment")
+            output.printMessage("2. Issue Invoice")
+            output.printMessage("3. View All Payments")
+            output.printMessage("4. View All Invoices")
+            output.printMessage("5. Find Payment by ID")
+            output.printMessage("6. Find Invoice by ID")
+            output.printMessage("0. Back")
 
-            when (scanner.nextLine()) {
+            when (input.prompt("Choose")) {
                 "1" -> handleProcessPayment()
                 "2" -> handleIssueInvoice()
                 "3" -> handleViewAllPayments()
@@ -40,124 +36,87 @@ class PaymentController(
                 "5" -> handleFindPaymentById()
                 "6" -> handleFindInvoiceById()
                 "0" -> return
-                else -> println("Invalid choice!")
+                else -> output.printError("Invalid choice!")
             }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun handleProcessPayment() {
-        println("------- Process Payment -------")
+        output.printSubHeader("Process Payment")
 
-        print("Payment ID: ")
-        val paymentId = scanner.nextLine().trim()
+        val paymentId = input.prompt("Payment ID")
         if (paymentId.isBlank()) {
-            println("Payment ID cannot be empty!")
+            output.printError("Payment ID cannot be empty!")
             return
         }
 
-        print("Booking ID: ")
-        val bookingId = scanner.nextLine().trim()
+        val bookingId = input.prompt("Booking ID")
         if (bookingId.isBlank()) {
-            println("Booking ID cannot be empty!")
+            output.printError("Booking ID cannot be empty!")
             return
         }
 
         val booking = HotelRepository.bookingRepository.getBookingById(bookingId)
         if (booking == null) {
-            println("Booking not found!")
+            output.printError("Booking not found!")
             return
         }
 
-        print("Amount (suggested: ${booking.totalAmount}): ")
-        val totalAmount = scanner.nextLine().toDoubleOrNull() ?: run {
-            println("Invalid amount!")
+        val totalAmount = input.promptDouble("Amount (suggested: ${booking.totalAmount})") ?: run {
+            output.printError("Invalid amount!")
             return
         }
         if (totalAmount <= 0) {
-            println("Amount must be positive!")
+            output.printError("Amount must be positive!")
             return
         }
 
-        print("Payment method (CASH/CREDIT_CARD): ")
-        val paymentMethod = scanner.nextLine()
-            .takeIf { it.isNotBlank() }
-            ?.let { input ->
-                enumValues<PaymentMethod>().find { it.name.equals(input, ignoreCase = true) }
-            } ?: run {
-            println("Invalid payment method! Using CASH as default.")
-            PaymentMethod.CASH
-        }
+        val paymentMethodInput = input.prompt("Payment method (CASH/CREDIT_CARD)")
+        val paymentMethod = enumValues<PaymentMethod>().find {
+            it.name.equals(paymentMethodInput, ignoreCase = true)
+        } ?: PaymentMethod.CASH
 
-        val payment: Payment = when (paymentMethod) {
-            PaymentMethod.CASH -> {
-                print("Received By: ")
-                val receivedBy = scanner.nextLine().trim()
-                if (receivedBy.isBlank()) {
-                    println("Received by name cannot be empty!")
-                    return
-                }
-                CashPayment(
-                    id = paymentId,
-                    totalAmount = totalAmount,
-                    date = now(),
-                    relatedBookingId = bookingId,
-                    receivedBy = receivedBy
-                )
-            }
-            PaymentMethod.CREDIT_CARD -> {
-                print("Card Number (16 digits): ")
-                val cardNumber = scanner.nextLine().trim()
-                if (cardNumber.length != 16 || !cardNumber.matches(Regex("\\d{16}"))) {
-                    println("Invalid card number!")
-                    return
-                }
-                print("Card Holder Name: ")
-                val cardHolderName = scanner.nextLine().trim()
-                if (cardHolderName.isBlank()) {
-                    println("Card holder name cannot be empty!")
-                    return
-                }
-                CreditCardPayment(
-                    id = paymentId,
-                    totalAmount = totalAmount,
-                    date = now(),
-                    relatedBookingId = bookingId,
-                    cardNumber = cardNumber,
-                    cardHolderName = cardHolderName
-                )
-            }
+        val payment = when (paymentMethod) {
+            PaymentMethod.CASH -> Payment(
+                paymentId = paymentId,
+                totalAmount = totalAmount,
+                paymentDate = now(),
+                style = PaymentStyle.CashPayment,
+                bookingId = bookingId
+            )
+
+            PaymentMethod.CREDIT_CARD -> Payment(
+                paymentId = paymentId,
+                totalAmount = totalAmount,
+                paymentDate = now(),
+                style = PaymentStyle.CreditCardPayment,
+                bookingId = bookingId
+            )
         }
 
         if (paymentService.processPayment(payment)) {
-            println("Payment processed successfully: ${payment.getPaymentDetails()}")
+            output.printSuccess("Payment processed successfully!")
+            output.printMessage(payment.getPaymentDetails())
         } else {
-            println("Failed to process payment!")
+            output.printError("Failed to process payment!")
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun handleIssueInvoice() {
-        println("------- Issue Invoice -------")
+        output.printSubHeader("Issue Invoice")
 
-        print("Invoice ID: ")
-        val invoiceId = scanner.nextLine().trim()
-
-        print("Booking ID: ")
-        val bookingId = scanner.nextLine().trim()
-
-        print("Customer ID: ")
-        val customerId = scanner.nextLine().trim()
+        val invoiceId = input.prompt("Invoice ID")
+        val bookingId = input.prompt("Booking ID")
+        val customerId = input.prompt("Customer ID")
 
         val items = mutableListOf<InvoiceItem>()
         while (true) {
-            print("Item description (Enter to stop): ")
-            val desc = scanner.nextLine()
+            val desc = input.prompt("Item description (Enter to stop)")
             if (desc.isBlank()) break
 
-            print("Item amount: ")
-            val amt = scanner.nextLine().toDoubleOrNull() ?: continue
-
+            val amt = input.promptDouble("Item amount") ?: continue
             items.add(InvoiceItem(desc, amt))
         }
 
@@ -181,38 +140,37 @@ class PaymentController(
         )
 
         paymentService.issueInvoice(invoice)
-        println(invoice.generateInvoiceText())
+        output.printSuccess("Invoice issued successfully!")
+        output.printMessage(invoice.generateInvoiceText())
     }
 
     private fun handleViewAllPayments() {
-        println("------- All Payments -------")
-        paymentService.getAllPayments().forEach { println(it.getPaymentDetails()) }
+        val payments = paymentService.getAllPayments()
+        if (payments.isEmpty()) output.printMessage("No payments found.")
+        else output.printList("ALL PAYMENTS", payments) { it.getPaymentDetails() }
     }
 
     private fun handleViewAllInvoices() {
-        println("------- All Invoices -------")
-        paymentService.getAllInvoices().forEach { println(it.generateInvoiceText()) }
+        val invoices = paymentService.getAllInvoices()
+        if (invoices.isEmpty()) output.printMessage("No invoices found.")
+        else output.printList("ALL INVOICES", invoices) { it.generateInvoiceText() }
     }
 
     private fun handleFindPaymentById() {
-        print("Enter Payment ID: ")
-        val id = scanner.nextLine().trim()
+        val id = input.prompt("Enter Payment ID")
         val payment = paymentService.getPayment(id)
-        if (payment != null) {
-            println(payment.getPaymentDetails())
-        } else {
-            println("Payment not found!")
-        }
+        if (payment != null)
+            output.printMessage(payment.getPaymentDetails())
+        else
+            output.printError("Payment not found!")
     }
 
     private fun handleFindInvoiceById() {
-        print("Enter Invoice ID: ")
-        val id = scanner.nextLine().trim()
+        val id = input.prompt("Enter Invoice ID")
         val invoice = paymentService.getInvoice(id)
-        if (invoice != null) {
-            println(invoice.generateInvoiceText())
-        } else {
-            println("Invoice not found!")
-        }
+        if (invoice != null)
+            output.printMessage(invoice.generateInvoiceText())
+        else
+            output.printError("Invoice not found!")
     }
 }

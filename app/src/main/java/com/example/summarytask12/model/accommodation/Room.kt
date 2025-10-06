@@ -1,5 +1,7 @@
 package com.example.summarytask12.model.accommodation
 
+import com.example.summarytask12.model.Discountable
+
 abstract class Room(
     val id: String,
     val numberRoom: String,

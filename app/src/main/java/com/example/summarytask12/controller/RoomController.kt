@@ -5,149 +5,127 @@ import com.example.summarytask12.extensions.filterByPriceRange
 import com.example.summarytask12.extensions.filterByType
 import com.example.summarytask12.extensions.sortByPrice
 import com.example.summarytask12.model.accommodation.DeluxeRoom
-import com.example.summarytask12.model.accommodation.Room
 import com.example.summarytask12.model.accommodation.StandardRoom
 import com.example.summarytask12.model.accommodation.SuiteRoom
 import com.example.summarytask12.services.RoomService
-import java.util.*
+import com.example.summarytask12.utils.InputHandler
+import com.example.summarytask12.utils.OutputHandler
 
 class RoomController(
     private val roomService: RoomService,
+    private val input: InputHandler = InputHandler(),
+    private val output: OutputHandler = OutputHandler()
 ) {
-    private val scanner: Scanner = Scanner(System.`in`)
+
     fun showMenu() {
         while (true) {
-            println("\n--- ROOM MANAGEMENT ---")
-            println("1. View all rooms")
-            println("2. Add new room")
-            println("3. Find room by ID")
-            println("4. Search room")
-            println("5. Update status room")
-            println("6. Delete room")
-            println("0. Back")
-            print("Choose: ")
+            output.printHeader("ROOM MANAGEMENT")
+            output.printMessage("1. View all rooms")
+            output.printMessage("2. Add new room")
+            output.printMessage("3. Find room by ID")
+            output.printMessage("4. Search room")
+            output.printMessage("5. Update room status")
+            output.printMessage("6. Delete room")
+            output.printMessage("0. Back")
+            val choice = input.prompt("Choose")
 
-            when (scanner.nextLine()) {
+            when (choice) {
                 "1" -> handleViewAllRooms()
                 "2" -> handleCreateRoom()
                 "3" -> handleFindRoomById()
-                "4" -> handSearchRooms()
-                "5" -> handUpdateStatusRoom()
+                "4" -> handleSearchRooms()
+                "5" -> handleUpdateStatusRoom()
                 "6" -> handleDeleteRoom()
                 "0" -> return
-                else -> println("Invalid choice")
+                else -> output.printError("Invalid choice!")
             }
         }
     }
 
     private fun handleViewAllRooms() {
         val rooms = roomService.getAllRooms()
-        if (rooms.isEmpty()) println("No rooms found.")
-        else rooms.forEach { println(it) }
+        if (rooms.isEmpty()) output.printMessage("No rooms found.")
+        else output.printList("ALL ROOMS", rooms) { it.toString() }
     }
 
     private fun handleCreateRoom() {
-        println("-------Add Room-------: ")
+        output.printSubHeader("Add Room")
 
-        print("Input Id room: ")
-        val idRoom = scanner.nextLine().trim()
-
-        print("Input number room: ")
-        val numberRoom = scanner.nextLine().trim()
-
-        print("Input type room: ")
-        val typeRoom = scanner.nextLine().trim().uppercase()
-
-        print("Input price room: ")
-        val priceRoom = scanner.nextLine().toDoubleOrNull() ?: run {
-            println("Invalid price!")
+        val idRoom = input.prompt("Room ID")
+        val numberRoom = input.prompt("Room Number")
+        val typeRoom = input.prompt("Room Type (STANDARD/DELUXE/SUITE)").uppercase()
+        val priceRoom = input.promptDouble("Room Price") ?: run {
+            output.printError("Invalid price!")
             return
         }
-        println("Is Available? (true/false): ")
-        val isAvailable = scanner.nextLine().toBooleanStrictOrNull() ?: true
+        val isAvailable = input.promptBoolean("Is Available? (true/false)") ?: true
 
         val newRoom = when (typeRoom) {
             "STANDARD" -> StandardRoom(idRoom, numberRoom, priceRoom, isAvailable)
             "DELUXE" -> {
-                println("Has Ocean View? (true/false): ")
-                val hasOceanView = scanner.nextLine().toBooleanStrictOrNull() ?: false
+                val hasOceanView = input.promptBoolean("Has Ocean View? (true/false)") ?: false
                 DeluxeRoom(idRoom, numberRoom, priceRoom, isAvailable, hasOceanView)
             }
 
             "SUITE" -> SuiteRoom(idRoom, numberRoom, priceRoom, isAvailable)
             else -> {
-                println("Invalid room type!!!!!!!")
+                output.printError("Invalid room type!")
                 return
             }
         }
-        if (roomService.addRoom(newRoom)) {
-            println("Room added successfully: $newRoom")
-        } else {
-            println("Failed to add room!!")
-        }
+
+        if (roomService.addRoom(newRoom))
+            output.printSuccess("Room added successfully: $newRoom")
+        else
+            output.printError("Failed to add room!")
     }
 
     private fun handleFindRoomById() {
-        print("Enter Room ID: ")
-        val id = scanner.nextLine()
+        val id = input.prompt("Enter Room ID")
         val room = roomService.getRoom(id)
-        println(room ?: "Room not found")
+        if (room != null)
+            output.printMessage(room.toString())
+        else
+            output.printError("Room not found!")
     }
 
-    private fun handSearchRooms() {
-        println("-------Search room...------- ")
+    private fun handleSearchRooms() {
+        output.printSubHeader("Search Rooms")
 
-        print("Type room (STANDARD/DELUXE/SUITE): ")
-        val typeRoom = scanner.nextLine().takeIf { it.isNotBlank() }?.uppercase()
+        val typeRoom = input.prompt("Room Type (STANDARD/DELUXE/SUITE, Enter to skip)")
+            .takeIf { it.isNotBlank() }?.uppercase()
+        val minPrice = input.promptDouble("Min Price (VND)") ?: 0.0
+        val maxPrice = input.promptDouble("Max Price (VND)") ?: Double.MAX_VALUE
 
-        print("Min price (VND): ")
-        val minPrice = scanner.nextLine().toDoubleOrNull() ?: 0.0
-
-        print("Max price (VND): ")
-        val maxPrice = scanner.nextLine().toDoubleOrNull() ?: Double.MAX_VALUE
-
-        val availableRooms = roomService.getAllRooms()
+        val result = roomService.getAllRooms()
             .availableOnly()
             .filterByPriceRange(minPrice, maxPrice)
             .let { if (typeRoom != null) it.filterByType(typeRoom) else it }
             .sortByPrice()
 
-        if (availableRooms.isEmpty()) {
-            println("Room not found")
-        } else {
-            println("List room: ")
-            availableRooms.forEach { println(it) }
-        }
+        if (result.isEmpty()) output.printMessage("No rooms found.")
+        else output.printList("SEARCH RESULTS", result) { it.toString() }
     }
 
-    private fun handUpdateStatusRoom() {
-        println("------- Update Room Status -------")
-
-        print("Enter Room ID: ")
-        val id = scanner.nextLine().trim()
-
-        print("Is Available? (true/false): ")
-        val isAvailable = scanner.nextLine().toBooleanStrictOrNull()
+    private fun handleUpdateStatusRoom() {
+        val id = input.prompt("Enter Room ID")
+        val isAvailable = input.promptBoolean("Is Available? (true/false)")
         if (isAvailable == null) {
-            println("Invalid input! Please enter true or false.")
+            output.printError("Invalid input! Please enter true or false.")
             return
         }
 
-        val updated = roomService.updateRoomAvailability(id, isAvailable)
-        if (updated) {
-            println("Room status updated successfully.")
-        } else {
-            println("Failed! Room with ID [$id] not found.")
-        }
+        if (roomService.updateRoomAvailability(id, isAvailable))
+            output.printSuccess("Room status updated successfully.")
+        else
+            output.printError("Room not found!")
     }
 
     private fun handleDeleteRoom() {
-        print("Enter Room ID: ")
-        val id = scanner.nextLine().trim()
-        if (roomService.deleteRoom(id)) {
-            println("Deleted!")
-        } else {
-            println("Room not found!")
-        }
+        val id = input.prompt("Enter Room ID")
+        if (roomService.deleteRoom(id))
+            output.printSuccess("Room deleted successfully.")
+        else
+            output.printError("Room not found!")
     }
 }
