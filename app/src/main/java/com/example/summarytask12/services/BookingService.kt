@@ -3,9 +3,7 @@ package com.example.summarytask12.services
 import com.example.summarytask12.repository.*
 import com.example.summarytask12.extensions.canCancel
 import com.example.summarytask12.model.Booking
-import com.example.summarytask12.model.users.VIPCustomer
 import com.example.summarytask12.utils.BookingStatus
-import java.util.*
 
 class BookingService(
     private val bookingRepo: BookingRepository,

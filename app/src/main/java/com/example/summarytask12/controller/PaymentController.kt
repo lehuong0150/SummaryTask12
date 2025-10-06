@@ -82,7 +82,7 @@ class PaymentController(
                 paymentId = paymentId,
                 totalAmount = totalAmount,
                 paymentDate = now(),
-                style = PaymentStyle.CashPayment,
+                style = PaymentMethod.CASH,
                 bookingId = bookingId
             )
 
@@ -90,7 +90,7 @@ class PaymentController(
                 paymentId = paymentId,
                 totalAmount = totalAmount,
                 paymentDate = now(),
-                style = PaymentStyle.CreditCardPayment,
+                style = PaymentMethod.CREDIT_CARD,
                 bookingId = bookingId
             )
         }

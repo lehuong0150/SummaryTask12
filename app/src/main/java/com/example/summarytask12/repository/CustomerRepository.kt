@@ -1,7 +1,6 @@
 package com.example.summarytask12.repository
 
 import com.example.summarytask12.model.users.Customer
-import com.example.summarytask12.model.users.VIPCustomer
 
 class CustomerRepository {
     private val customers = mutableListOf<Customer>()

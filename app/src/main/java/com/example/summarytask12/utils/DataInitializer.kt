@@ -107,15 +107,15 @@ object DataInitializer {
         val payments = listOf(
             Payment(
                 "P001", 1600000.0, "2025-09-17T10:30:00".toLocalDateTime(),
-                PaymentStyle.CreditCardPayment, "B001"
+                PaymentMethod.CASH, "B001"
             ),
             Payment(
                 "P002", 6000000.0, "2025-09-18T15:45:00".toLocalDateTime(),
-                PaymentStyle.CashPayment, "B002",
+                PaymentMethod.CREDIT_CARD, "B002",
             ),
             Payment(
                 "P003", 3400000.0, "2025-09-19T09:00:00".toLocalDateTime(),
-                PaymentStyle.CashPayment, "B003"
+                PaymentMethod.CASH, "B003"
             )
         )
         payments.forEach { HotelRepository.paymentRepository.addPayment(it) }

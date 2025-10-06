@@ -1,10 +1,7 @@
 package com.example.summarytask12.services
 
 import com.example.summarytask12.model.users.Customer
-import com.example.summarytask12.model.users.VIPCustomer
 import com.example.summarytask12.repository.CustomerRepository
-import com.example.summarytask12.repository.HotelRepository
-
 
 class CustomerService(private val customerRepo: CustomerRepository) {
 
