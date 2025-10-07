@@ -18,7 +18,7 @@ class OutputHandler {
 
     fun printError(message: String) = println("ERROR: $message")
 
-    fun printSuccess(message: String) = println("✅ $message")
+    fun printSuccess(message: String) = println("$message")
 
     fun <T> printList(title: String, items: List<T>, mapper: (T) -> String) {
         printHeader(title)

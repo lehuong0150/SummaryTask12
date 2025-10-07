@@ -1,6 +1,7 @@
 package com.example.summarytask12.model.payment
 
 import android.os.Build
+import androidx.annotation.RequiresApi
 import com.example.summarytask12.utils.PaymentMethod
 import java.time.LocalDateTime
 
@@ -12,11 +13,8 @@ class Payment(
     val bookingId: String
 ) {
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun getPaymentDetails(): String {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            "Payment:  $${totalAmount} on ${paymentDate.toLocalDate()}"
-        } else {
-            TODO("VERSION.SDK_INT < O")
-        }
+        return "Payment:  $${totalAmount} on ${paymentDate.toLocalDate()}"
     }
 }

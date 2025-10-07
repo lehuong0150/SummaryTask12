@@ -8,6 +8,7 @@ import com.example.summarytask12.services.PaymentService
 import com.example.summarytask12.services.RoomService
 import com.example.summarytask12.utils.InputHandler
 import com.example.summarytask12.utils.OutputHandler
+import com.example.summarytask12.utils.Message
 
 @RequiresApi(Build.VERSION_CODES.O)
 class ReportController(
@@ -20,18 +21,18 @@ class ReportController(
 
     fun showMenu() {
         while (true) {
-            output.printHeader("REPORT MANAGEMENT")
+            output.printHeader(Message.REPORT_HEADER)
             output.printMessage("1. Revenue Report")
             output.printMessage("2. Room Status Report")
             output.printMessage("3. Customer Report")
             output.printMessage("0. Back")
 
-            when (input.prompt("Choose")) {
+            when (input.prompt("Choose: ")) {
                 "1" -> showRevenueReport()
                 "2" -> showRoomStatusReport()
                 "3" -> showCustomerReport()
                 "0" -> return
-                else -> output.printError("Invalid choice!")
+                else -> output.printError(Message.INVALID_CHOICE)
             }
         }
     }
@@ -44,14 +45,14 @@ class ReportController(
         output.printSubHeader("Revenue Report")
 
         val payments = paymentService.getAllPayments()
-        val totalRevenue = payments.sumOf { it.totalAmount }
-
-        output.printMessage("Total Revenue: $totalRevenue")
         if (payments.isEmpty()) {
-            output.printMessage("No payments found.")
-        } else {
-            printReport("REVENUE REPORT", payments) { it.summary() }
+            output.printMessage(Message.NO_DATA)
+            return
         }
+
+        val totalRevenue = payments.sumOf { it.totalAmount }
+        output.printMessage("Total Revenue: $totalRevenue")
+        printReport("REVENUE REPORT", payments) { it.summary() }
     }
 
     private fun showRoomStatusReport() {
@@ -59,14 +60,14 @@ class ReportController(
 
         val rooms = roomService.getAllRooms()
         if (rooms.isEmpty()) {
-            output.printMessage("No rooms found.")
-        } else {
-            printReport("ROOM STATUS REPORT", rooms) { room ->
-                "Room ${room.numberRoom} | Type: ${room.type} | Status: ${
-                    if (room.isAvailable)
-                        "Available" else "Occupied"
-                }"
-            }
+            output.printMessage(Message.NO_DATA)
+            return
+        }
+
+        printReport("ROOM STATUS REPORT", rooms) { room ->
+            "Room ${room.numberRoom} | Type: ${room.type} | Status: ${
+                if (room.isAvailable) "Available" else "Occupied"
+            }"
         }
     }
 
@@ -75,11 +76,12 @@ class ReportController(
 
         val customers = customerService.getAllCustomers()
         if (customers.isEmpty()) {
-            output.printMessage("No customers found.")
-        } else {
-            printReport("CUSTOMER REPORT", customers) {
-                "${it.name} | ${it.email} | ${it.phone}"
-            }
+            output.printMessage(Message.NO_DATA)
+            return
+        }
+
+        printReport("CUSTOMER REPORT", customers) {
+            "${it.name} | ${it.email} | ${it.phone}"
         }
     }
 }

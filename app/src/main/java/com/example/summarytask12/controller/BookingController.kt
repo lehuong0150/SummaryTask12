@@ -7,9 +7,7 @@ import com.example.summarytask12.model.users.VIPCustomer
 import com.example.summarytask12.services.BookingService
 import com.example.summarytask12.services.CustomerService
 import com.example.summarytask12.services.RoomService
-import com.example.summarytask12.utils.InputHandler
-import com.example.summarytask12.utils.OutputHandler
-import com.example.summarytask12.utils.PaymentMethod
+import com.example.summarytask12.utils.*
 import java.time.LocalDateTime
 import java.time.LocalDateTime.now
 import java.time.format.DateTimeParseException
@@ -25,8 +23,8 @@ class BookingController(
     @RequiresApi(Build.VERSION_CODES.O)
     fun showMenu() {
         while (true) {
-            output.printHeader("BOOKING MANAGEMENT")
-            output.printMessage("1. Create booking")
+            output.printHeader(Message.BOOKING_HEADER)
+            output.printMessage("1. ${Message.BOOKING_CREATE}")
             output.printMessage("2. View booking by ID")
             output.printMessage("3. View all bookings")
             output.printMessage("4. View bookings by customer")
@@ -35,7 +33,7 @@ class BookingController(
             output.printMessage("7. Delete booking")
             output.printMessage("0. Back")
 
-            when (input.prompt("Choose")) {
+            when (input.prompt("Choose: ")) {
                 "1" -> handleCreateBooking()
                 "2" -> handleViewBookingById()
                 "3" -> handleViewAllBookings()
@@ -44,52 +42,48 @@ class BookingController(
                 "6" -> handleCancelBooking()
                 "7" -> handleDeleteBooking()
                 "0" -> return
-                else -> output.printError("Invalid choice!")
+                else -> output.printError(Message.INVALID_CHOICE)
             }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun handleCreateBooking() {
-        output.printSubHeader("Create Booking")
+        output.printSubHeader(Message.BOOKING_CREATE)
 
-        val customerId = input.prompt("Enter Customer ID")
+        val customerId = input.prompt(Message.BOOKING_ENTER_CUSTOMER_ID)
         val customer = customerService.getCustomer(customerId)
         if (customer == null) {
-            output.printError("Customer not found!")
+            output.printError(Message.BOOKING_CUSTOMER_NOT_FOUND)
             return
         }
-        output.printMessage("Customer Info: ${customer.getDisplayInfo()}")
-
         if (customer is VIPCustomer) {
             output.printMessage("Membership Level: VIP")
-            val request = input.prompt("Special Request (Enter to skip)")
-            if (request.isNotBlank()) {
-                customer.addSpecialRequest(request)
-            }
+            val request = input.prompt(Message.CUSTOMER_SPECIAL_REQUEST)
+            if (request.isNotBlank()) customer.addSpecialRequest(request)
         } else {
             output.printMessage("Membership Level: ${customer.getMembershipLevel}")
         }
 
-        val roomId = input.prompt("Enter Room ID")
+        val roomId = input.prompt(Message.BOOKING_ENTER_ROOM_ID)
         val room = roomService.getRoom(roomId)?.takeIf { it.isAvailable }
         if (room == null) {
-            output.printError("Room not found or not available!")
+            output.printError(Message.BOOKING_ROOM_NOT_FOUND)
             return
         }
         output.printMessage("Room info: $room")
 
-        val nights = input.promptInt("Enter number of nights") ?: run {
-            output.printError("Invalid number of nights!")
+        val nights = input.promptInt(Message.BOOKING_ENTER_NIGHTS) ?: run {
+            output.printError(Message.INPUT_ERROR)
             return
         }
 
-        val paymentMethodInput = input.prompt("Payment method (CREDIT_CARD/CASH, Enter to skip)")
+        val paymentMethodInput = input.prompt(Message.BOOKING_ENTER_PAYMENT_METHOD)
         val paymentMethod = enumValues<PaymentMethod>().find {
             it.name.equals(paymentMethodInput, ignoreCase = true)
         } ?: PaymentMethod.CASH
 
-        val dateInput = input.prompt("Booking date (Enter to use today)")
+        val dateInput = input.prompt(Message.BOOKING_ENTER_DATE)
         val bookingDate = if (dateInput.isBlank()) now() else {
             try {
                 LocalDateTime.parse(dateInput)
@@ -111,32 +105,32 @@ class BookingController(
         )
 
         if (bookingService.createBooking(booking)) {
-            output.printSuccess("Booking created successfully!")
+            output.printSuccess(Message.BOOKING_CREATED)
             output.printMessage(booking.toString())
         } else {
-            output.printError("Failed to create booking!")
+            output.printError(Message.BOOKING_FAILED)
         }
     }
 
     private fun handleViewBookingById() {
-        val id = input.prompt("Enter Booking ID")
+        val id = input.prompt(Message.BOOKING_ENTER_ID)
         val booking = bookingService.getBooking(id)
         if (booking != null)
             output.printMessage(booking.toString())
         else
-            output.printError("Booking not found!")
+            output.printError(Message.BOOKING_NOT_FOUND)
     }
 
     private fun handleViewAllBookings() {
         val bookings = bookingService.getAllBookings()
         if (bookings.isEmpty())
-            output.printMessage("No bookings found.")
+            output.printMessage(Message.BOOKING_NO_DATA)
         else
             output.printList("ALL BOOKINGS", bookings) { it.toString() }
     }
 
     private fun handleViewBookingsByCustomer() {
-        val customerId = input.prompt("Enter Customer ID")
+        val customerId = input.prompt(Message.BOOKING_ENTER_CUSTOMER_ID)
         val bookings = bookingService.getBookingsByCustomer(customerId)
         if (bookings.isEmpty())
             output.printMessage("No bookings for this customer.")
@@ -145,26 +139,29 @@ class BookingController(
     }
 
     private fun handleConfirmBooking() {
-        val id = input.prompt("Enter Booking ID to confirm")
+        output.printHeader("CONFIRM BOOKING")
+        val id = input.prompt(Message.BOOKING_ENTER_ID)
         if (bookingService.confirmBooking(id))
-            output.printSuccess("Booking confirmed successfully.")
+            output.printSuccess(Message.BOOKING_CONFIRM)
         else
-            output.printError("Booking not found.")
+            output.printError(Message.BOOKING_NOT_FOUND)
     }
 
     private fun handleCancelBooking() {
-        val id = input.prompt("Enter Booking ID to cancel")
+        output.printHeader("CANCEL BOOKING")
+        val id = input.prompt(Message.BOOKING_ENTER_ID)
         if (bookingService.cancelBooking(id))
-            output.printSuccess("Booking cancelled successfully.")
+            output.printSuccess(Message.BOOKING_CANCEL)
         else
-            output.printError("Booking not found.")
+            output.printError(Message.BOOKING_NOT_FOUND)
     }
 
     private fun handleDeleteBooking() {
-        val id = input.prompt("Enter Booking ID to delete")
+        output.printHeader("DELETE BOOKING")
+        val id = input.prompt(Message.BOOKING_ENTER_ID)
         if (bookingService.deleteBooking(id))
-            output.printSuccess("Booking deleted successfully.")
+            output.printSuccess(Message.BOOKING_DELETE)
         else
-            output.printError("Booking not found.")
+            output.printError(Message.BOOKING_NOT_FOUND)
     }
 }

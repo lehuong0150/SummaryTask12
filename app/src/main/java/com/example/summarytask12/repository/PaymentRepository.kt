@@ -22,9 +22,6 @@ class PaymentRepository {
     fun getPaymentById(id: String): Payment? =
         payments.find { it.paymentId == id }
 
-    fun getPaymentsByBookingId(bookingId: String): List<Payment> =
-        payments.filter { it.bookingId == bookingId }
-
     fun getInvoiceById(id: String): Invoice? =
         invoices.find { it.invoiceId == id }
 }

@@ -27,7 +27,9 @@ class DeluxeRoom(
     }
 
     override fun toString(): String {
-        return "DeluxeRoom(id=$id, numberRoom= $numberRoom, type=$type, price=$price, isAvailable=$isAvailable, " +
-                "maxGuests=$maxGuests, hasOceanView=$hasOceanView, describeRoom = ${getDescribeRoom()})\n"
+        return "DeluxeRoom(id=$id, numberRoom= $numberRoom, type=$type, " +
+                "price=$price, isAvailable=$isAvailable, " +
+                "maxGuests=$maxGuests, hasOceanView=$hasOceanView, " +
+                "describeRoom = ${getDescribeRoom()})\n"
     }
 }
