@@ -1,106 +1,79 @@
 # 🏨 Hotel Booking Management System
 
 ## 📌 Giới thiệu
-Đây là một hệ thống quản lý đặt phòng khách sạn (**Hotel Booking Management System**) được xây dựng bằng **Kotlin**.  
-Ứng dụng mô phỏng các nghiệp vụ cơ bản của khách sạn và thể hiện rõ các khái niệm **Lập trình Hướng Đối Tượng (OOP)**.
+
+****Hotel Booking Management System** là một ứng dụng console viết bằng **Kotlin**, mô phỏng quy trình đặt phòng khách sạn từ đầu đến cuối.  
+ thể hiện rõ các nguyên lý **Lập trình Hướng Đối Tượng (OOP)** 
 
 ---
 
-## ✨ Các chức năng chính
-- **Tìm kiếm và lọc phòng**
-  - Tìm kiếm theo loại phòng (`STANDARD / DELUXE / SUITE`)
-  - Lọc theo khoảng giá
-  - Chỉ hiển thị phòng còn trống (`isAvailable = true`)
+## ✨ Chức năng chính
 
-- **Tạo đặt phòng (Booking)**
-  - Quy trình đặt phòng cho khách thường
-  - Khách hàng VIP có thể thêm `specialRequests`
-  - Tự động tính toán giảm giá dựa trên thành viên
-  - Chọn phương thức thanh toán (`CREDIT_CARD / CASH`)
+### 🔹 1. Quản lý phòng (Room Management)
+- Xem danh sách phòng
+- Thêm, cập nhật, xóa phòng
+- Tìm kiếm và lọc:
+  - Theo loại phòng: `STANDARD`, `DELUXE`, `SUITE`
+  - Theo khoảng giá
+  - Theo trạng thái (chỉ hiện phòng trống)
 
-- **Hủy đặt phòng**
-  - Xác thực dựa trên trạng thái đặt và phương thức thanh toán
-  - Cập nhật trạng thái phòng trở lại trống
-  - Thay đổi trạng thái booking → `"CANCELLED"`
-  - Reset `totalAmount = 0.0` khi hủy thành công
+### 🔹 2. Đặt phòng (Booking Management)
+- Tạo booking mới cho khách hàng
+- Tính **tổng tiền tự động** dựa trên số đêm và loại phòng
+- Khách VIP tự động được giảm giá
+- Chọn phương thức thanh toán (`CASH`, `CREDIT_CARD`)
+- Xác nhận / Hủy booking (cập nhật trạng thái phòng tự động)
 
-- **Quản lý phòng**
-  - Thêm phòng mới
-  - Cập nhật thông tin phòng
-  - Xóa phòng theo ID
+### 🔹 3. Quản lý khách hàng (Customer Management)
+- Đăng ký khách hàng mới (Basic / Premium / VIP)
+- Cập nhật thông tin khách hàng
+- Xóa khách hàng
+- Hiển thị danh sách tất cả khách hàng
 
-- **Xem danh sách**
-  - Toàn bộ phòng
-  - Toàn bộ khách hàng
-  - Toàn bộ booking
+### 🔹 4. Thanh toán & Hóa đơn (Payment Management)
+- Thực hiện thanh toán (bất đồng bộ bằng **Coroutine**)
+- Xuất hóa đơn kèm thông tin chi tiết
+- Xem danh sách tất cả thanh toán và hóa đơn
+
+### 🔹 5. Báo cáo (Report Management)
+- Báo cáo doanh thu (Revenue Report)
+- Báo cáo trạng thái phòng
+- Báo cáo danh sách khách hàng
 
 ---
 
 ## 🧩 Các khái niệm OOP áp dụng
-- **Abstract Class**  
-  - `Person`, `Room`
-- **Inheritance (Kế thừa)**  
-  - `Customer` → `VIPCustomer`  
-  - `Room` → `StandardRoom`, `DeluxeRoom`, `SuiteRoom`
-- **Polymorphism (Đa hình)**  
-  - Qua interface `Discountable` và override của `VIPCustomer`
-- **Encapsulation (Đóng gói)**  
-  - Thuộc tính `private/protected`, getter/setter
-- **Interface**  
-  - `Discountable` dùng để áp dụng chính sách giảm giá
+
+| Khái niệm | Mô tả |
+|------------|--------|
+| **Abstraction** | `Person`, `Room` là lớp trừu tượng. |
+| **Inheritance** | `Customer` → `VIPCustomer`, `Room` → `DeluxeRoom`, `SuiteRoom`, `StandardRoom`. |
+| **Polymorphism** | Sử dụng interface `Discountable` và ghi đè `discountRate()` trong lớp con. |
+| **Encapsulation** | Các thuộc tính được bảo vệ bằng `private` và truy cập thông qua getter/setter. |
+| **Interface** | `Discountable` định nghĩa cơ chế giảm giá cho khách hàng. |
 
 ---
 
 ## 🏗️ Kiến trúc hệ thống
 
-### 1. Person (abstract class)
-- Thuộc tính: `id`, `name`, `email`, `phone`
-- Phương thức trừu tượng:  
-  - `getRole()`
-  - `getDisplayInfo()`
-  - `validateInfo()`
+## 📂 Cấu trúc thư mục dự án
 
-### 2. Customer (open class, kế thừa từ Person)
-- Thuộc tính: `membershipLevel`
-- Phương thức: `getDisplayInfo()` → hiển thị thông tin khách hàng
-- Cài đặt `Discountable` để được hưởng ưu đãi
-- Là lớp cha của `VIPCustomer`
+```plaintext
+summarytask12/
+│
+├── controller/          # Xử lý logic giao diện console (menu, nhập/xuất)
+├── model/               # Khai báo đối tượng dữ liệu (Room, Booking, Customer, Payment...)
+│   ├── accommodation/   # Các loại phòng: Standard, Deluxe, Suite
+│   ├── payment/         # Thanh toán & Hóa đơn
+│   └── users/           # Người dùng: Customer, VIPCustomer
+│
+├── repository/          # Quản lý dữ liệu trong bộ nhớ (in-memory database)
+├── services/            # Xử lý nghiệp vụ, tương tác giữa controller và repository
+├── extensions/          # Các hàm mở rộng (filter, sort, summary, v.v.)
+├── utils/               # Hằng số, enum, message, input/output handler
+└── Main.kt              # Điểm khởi chạy chương trình
 
-### 3. VIPCustomer (kế thừa từ Customer)
-- Thuộc tính: `specialRequests`
-- Phương thức: `addSpecialRequest()`
-- Override `discountRate()` → áp dụng giảm giá cao hơn khách thường
-
-### 4. Room (abstract class)
-- Thuộc tính: `id`, `price`, `isAvailable`, `type`
-- Phương thức: `getInfo()`
-- Kế thừa thành 3 loại phòng:
-  - `StandardRoom` – phòng tiêu chuẩn
-  - `DeluxeRoom` – phòng cao cấp (có `hasOceanView`)
-  - `SuiteRoom` – phòng hạng sang
-
-### 5. Booking
-- Thuộc tính:  
-  - `id`, `customerId`, `roomId`, `dateCreated`, `nights`,  
-    `methodPayment`, `status`, `totalAmount`
-- Liên kết:
-  - `customerId` → `Customer`
-  - `roomId` → `Room`
-- Sử dụng `Discountable`:  
-  Nếu khách hàng là **VIP**, hệ thống tự động tính **giảm giá** khi tính `totalAmount`.
-  
-### 6. HotelDB (Database giả lập)
-- `HotelDB` là một **object singleton** dùng để mô phỏng **cơ sở dữ liệu trong bộ nhớ (in-memory DB)**.
-- Lưu trữ và quản lý danh sách:
-  - `customerList` – danh sách khách hàng
-  - `roomList` – danh sách phòng
-  - `bookingList` – danh sách booking
-- Có sẵn dữ liệu mẫu được khởi tạo trong `init { ... }`
-- Cung cấp các chức năng CRUD:
-  - `addCustomer()`, `getCustomer()`
-  - `addRoom()`, `getRoom()`
-  - `addBooking()`, `getBooking()`
-  - `updateBooking()`, `deleteRoom()`
+```
 
 ## 📊 Sơ đồ phân cấp hệ thống
 
