@@ -3,9 +3,7 @@ package com.example.summarytask12.utils
 object Message {
     // ==== COMMON ====
     const val INVALID_CHOICE = "Invalid choice!"
-    const val NOT_FOUND = "Not found!"
     const val INPUT_ERROR = "Invalid input!"
-    const val ACTION_SUCCESS = "Action completed successfully!"
     const val ACTION_FAILED = "Action failed!"
     const val ENTER_ID = "Enter ID: "
     const val ENTER_NAME = "Enter Name (Enter to skip): "
@@ -13,7 +11,6 @@ object Message {
     const val ENTER_PHONE = "Enter Phone (Enter to skip): "
     const val ENTER_PRICE = "Enter Price (Enter to skip): "
     const val ENTER_STATUS = "Enter Status (true/false): "
-    const val ENTER_DATE = "Enter Date (Enter to use today): "
     const val NO_DATA = "No data found!"
 
     // ==== BOOKING ====
@@ -54,7 +51,7 @@ object Message {
     const val CUSTOMER_DELETED = "Customer deleted successfully!"
     const val CUSTOMER_NOT_FOUND = "Customer not found!"
 
-    // Payment
+    //==== Payment ====
     const val PAYMENT_HEADER = "PAYMENT MANAGEMENT"
     const val PAYMENT_ENTER_ID = "Enter Payment ID: "
     const val PAYMENT_PROCESS_SUCCESS = "Payment processed successfully!"
@@ -65,7 +62,7 @@ object Message {
     const val PAYMENT_ID_EMPTY = "Payment ID cannot be empty!"
     const val BOOKING_ID_EMPTY = "Booking ID cannot be empty!"
 
-    // Invoice
+    //==== Invoice ====
     const val REPORT_HEADER = "REPORT MANAGEMENT"
     const val INVOICE_ENTER_ID = "Enter Invoice ID: "
     const val INVOICE_ISSUE_SUCCESS = "Invoice issued successfully!"

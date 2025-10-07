@@ -2,24 +2,24 @@ package com.example.summarytask12.repository
 
 import com.example.summarytask12.model.accommodation.Room
 
-class RoomRepository {
-    private val rooms = mutableListOf<Room>()
+class RoomRepository : BaseRepository<Room>() {
 
     fun addRoom(room: Room): Boolean =
-        rooms.none { it.id == room.id }
-            .also { canAdd -> if (canAdd) rooms.add(room) }
+        data.none { it.id == room.id }
+            .also { canAdd ->
+                if (canAdd) data.add(room)
+            }
 
-    fun getAllRooms(): List<Room> = rooms.toList()
+    fun getAllRooms(): List<Room> = getAll()
 
-    fun getRoomById(id: String): Room? =
-        rooms.find { it.id == id }
+    fun getRoomById(id: String): Room? = findBy { it.id == id }
 
     fun updateRoomAvailability(roomId: String, isAvailable: Boolean): Boolean =
-        getRoomById(roomId)?.apply {
-            this.isAvailable = isAvailable
-        }?.let { true } ?: false
+        findBy { it.id == roomId }?.let {
+            it.isAvailable = isAvailable
+            true
+        } ?: false
 
     fun deleteRoom(roomId: String): Boolean =
-        rooms.removeIf { it.id == roomId }
+        data.removeIf { it.id == roomId }
 }
-
