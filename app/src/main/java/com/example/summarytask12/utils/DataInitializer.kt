@@ -25,29 +25,29 @@ object DataInitializer {
         initInvoices()
     }
 
-    private fun initCustomers() {
-        val customers = listOf(
+    private fun initCustomers() = with(HotelRepository.customerRepository) {
+        listOf(
             Customer(
-                "C001", "Nguyễn Văn Hải", "vana@email.com",
-                "0901234567", "BASIC"
+                "C001", "Nguyễn Văn Hải", "vana@email.com", "0901234567",
+                "BASIC"
             ),
             VIPCustomer(
                 "C002", "Trần Thị Nga", "thib@vip.com", "0907654321",
                 mutableListOf(
-                    "Phòng tầng cao view biển", "Late checkout 3PM",
-                    "Bữa sáng tại phòng", "Xe đưa đón sân bay"
+                    "Phòng tầng cao view biển", "Late checkout 3PM", "Bữa sáng tại phòng",
+                    "Xe đưa đón sân bay"
                 )
             ),
             Customer(
-                "C003", "Lê Ngọc Linh", "linh@email.com",
-                "0905634567", "BASIC"
+                "C003", "Lê Ngọc Linh", "linh@email.com", "0905634567",
+                "BASIC"
             ),
             VIPCustomer(
                 "C004", "Phan Đức Thanh Duy", "duy@vip.com",
                 "0907654321",
                 mutableListOf(
-                    "Late checkout 3PM", "Bữa sáng tại phòng",
-                    "Xe đưa đón sân bay", "Welcome drink champagne"
+                    "Late checkout 3PM", "Bữa sáng tại phòng", "Xe đưa đón sân bay",
+                    "Welcome drink champagne"
                 )
             ),
             Customer(
@@ -58,34 +58,31 @@ object DataInitializer {
                 "C006", "Võ Tiến Khoa", "khoa@email.com",
                 "0925634169", "PREMIUM"
             )
-        )
-
-        customers.forEach {
-            HotelRepository.customerRepository.addCustomer(it)
-        }
+        ).forEach { addCustomer(it) }
     }
 
-    private fun initRooms() {
-        val rooms = listOf(
+
+    private fun initRooms() = with(HotelRepository.roomRepository) {
+        listOf(
             StandardRoom("R001", "101", 800000.0, true),
             StandardRoom("R002", "102", 850000.0, true),
             DeluxeRoom(
-                "R003", "103", 1200000.0, isAvailable = true,
+                "R003", "103", 1200000.0, true,
                 hasOceanView = true
             ),
             DeluxeRoom(
-                "R004", "104", 1100000.0, isAvailable = false,
+                "R004", "104", 1100000.0, false,
                 hasOceanView = false
             ),
             SuiteRoom("R005", "105", 2000000.0, false),
             StandardRoom("R006", "106", 850000.0, false)
-        )
-        rooms.forEach { HotelRepository.roomRepository.addRoom(it) }
+        ).forEach { addRoom(it) }
     }
 
+
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun initBookings() {
-        val bookings = listOf(
+    private fun initBookings() = with(HotelRepository.bookingRepository) {
+        listOf(
             Booking(
                 "B001", "C001", "R004", "2025-09-17T00:00:00".toLocalDateTime(),
                 2, BookingStatus.CONFIRMED, PaymentMethod.CASH, 2200000.0
@@ -98,32 +95,31 @@ object DataInitializer {
                 "B003", "C002", "R006", "2025-09-16T00:00:00".toLocalDateTime(),
                 4, BookingStatus.CONFIRMED, PaymentMethod.CREDIT_CARD, 3400000.0
             )
-        )
-        bookings.forEach { HotelRepository.bookingRepository.addBooking(it) }
+        ).forEach { addBooking(it) }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun initPayments() {
-        val payments = listOf(
+    private fun initPayments() = with(HotelRepository.paymentRepository) {
+        listOf(
             Payment(
                 "P001", 1600000.0, "2025-09-17T10:30:00".toLocalDateTime(),
                 PaymentMethod.CASH, "B001"
             ),
             Payment(
                 "P002", 6000000.0, "2025-09-18T15:45:00".toLocalDateTime(),
-                PaymentMethod.CREDIT_CARD, "B002",
+                PaymentMethod.CREDIT_CARD, "B002"
             ),
             Payment(
                 "P003", 3400000.0, "2025-09-19T09:00:00".toLocalDateTime(),
                 PaymentMethod.CASH, "B003"
             )
-        )
-        payments.forEach { HotelRepository.paymentRepository.addPayment(it) }
+        ).forEach { addPayment(it) }
     }
 
+
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun initInvoices() {
-        val invoices = listOf(
+    private fun initInvoices() = with(HotelRepository.paymentRepository) {
+        listOf(
             Invoice(
                 "I001", "B001", "C001",
                 listOf(
@@ -148,7 +144,6 @@ object DataInitializer {
                 issueDate = "2025-09-19T09:00:00".toLocalDateTime(),
                 dueDate = "2025-09-22T09:00:00".toLocalDateTime()
             )
-        )
-        invoices.forEach { HotelRepository.paymentRepository.addInvoice(it) }
+        ).forEach { addInvoice(it) }
     }
 }

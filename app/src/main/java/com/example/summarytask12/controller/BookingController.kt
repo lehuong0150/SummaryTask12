@@ -57,6 +57,7 @@ class BookingController(
             output.printError(Message.BOOKING_CUSTOMER_NOT_FOUND)
             return
         }
+
         if (customer is VIPCustomer) {
             output.printMessage("Membership Level: VIP")
             val request = input.prompt(Message.CUSTOMER_SPECIAL_REQUEST)
@@ -94,6 +95,7 @@ class BookingController(
         }
 
         val bookingId = "B" + (1000..9999).random()
+
         val booking = Booking(
             id = bookingId,
             customerId = customerId,
@@ -103,14 +105,17 @@ class BookingController(
             paymentMethod = paymentMethod,
             totalAmount = Booking.calculateTotal(customerId, roomId, nights)
         )
-
         if (bookingService.createBooking(booking)) {
+            room.isAvailable = false
+            roomService.updateRoomAvailability(roomId,room.isAvailable)
+
             output.printSuccess(Message.BOOKING_CREATED)
             output.printMessage(booking.toString())
         } else {
             output.printError(Message.BOOKING_FAILED)
         }
     }
+
 
     private fun handleViewBookingById() {
         val id = input.prompt(Message.BOOKING_ENTER_ID)

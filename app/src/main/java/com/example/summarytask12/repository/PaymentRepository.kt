@@ -8,7 +8,7 @@ class PaymentRepository : BaseRepository<Payment>() {
     private val invoices = mutableListOf<Invoice>()
 
     // Payment
-    fun addPayment(payment: Payment): Boolean = add(payment)
+    fun addPayment(payment: Payment): Boolean = data.add(payment)
 
     fun getPaymentById(id: String): Payment? = findBy { it.paymentId == id }
 
